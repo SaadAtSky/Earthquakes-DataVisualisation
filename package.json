@@ -1,0 +1,30 @@
+{
+  "name": "earthquakes-datavisualisation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "data_download",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/believer4u/Earthquakes-DataVisualisation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/believer4u/Earthquakes-DataVisualisation/issues"
+  },
+  "homepage": "https://github.com/believer4u/Earthquakes-DataVisualisation#readme",
+  "dependencies": {
+    "aws-sdk": "^2.1071.0",
+    "csv-parser": "^3.0.0",
+    "guardian-js": "^4.0.1",
+    "moment": "^2.29.1",
+    "typescript": "^4.5.4"
+  },
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^17.0.16"
+  }
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake</title>
+    <!--plotly-->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!--websockets-->
+    <script src="websocket.js"></script>
+    <!--slider-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+</head>
+
+<body>
+    <!--Div that displays the data-->
+    <div id="mapDiv" style="width: 1000px;height: 1000px;"></div>
+    <p>
+        <label for="amount">Year:</label>
+        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+
+    <div id="slider-range-min"></div>
+    <script>
+        // variables declaration
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoiYmVsaWV2ZXI0dS0iLCJhIjoiY2wwanIyNXF4MDNqYTNjczhxbWJ6YXdvNCJ9.M-bbZyHNHfpxiAtw5fL_eQ'
+        let layerObj = {}
+        let layerArray = [],currentYearDataArray = []
+        let regions_geojson = []
+        let color;
+        let numberOfRegions = 5
+        let transparency = []
+        let earthquakesData
+        let currentYear = 1960
+
+        // get boundaries geoJSON
+        let regionCoordinates = []
+        regionCoordinates[0] = [[[-180, -90], [-108, -90], [-108, 90], [-180, 90], [-180, -90]]] //region 1
+        regionCoordinates[1] = [[[-108, -90], [-36, -90], [-36, 90], [-108, 90], [-108, -90]]] //region 2
+        regionCoordinates[2] = [[[-36, -90], [36, -90], [36, 90], [-36, 90], [-36, -90]]] //region 3
+        regionCoordinates[3] = [[[36, -90], [108, -90], [108, 90], [36, 90], [36, -90]]] //region 4
+        regionCoordinates[4] = [[[108, -90], [180, -90], [180, 90], [108, 90], [108, -90]]] //region 5
+
+        for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+            regions_geojson[regionIndex] = {
+                "type": "FeatureCollection",
+                "features": [
+                    { "type": "Feature", "properties": {}, "geometry": { "type": "Polygon", "coordinates": regionCoordinates[regionIndex] } }
+                ]
+            }
+        }
+
+        // plot
+        let config = {
+            mapboxAccessToken: MAPBOX_TOKEN
+        }
+        //Have to set data as scatter map box to get plot to work
+        let data = [{
+            type: 'scattermapbox',
+        }];
+
+        initTransparency()
+        plot()
+
+        // slider function
+        $(function () {
+            $("#slider-range-min").slider({
+                range: "min",
+                value: 1965,
+                min: 1965,
+                max: 2022,
+                slide: function (event, ui) {
+                    $("#amount").val(ui.value);
+                    currentYear = ui.value
+                    initTransparency()
+                    buildCurrentYearDataArray()
+                    updateTransparency()
+                    plot()
+                }
+            });
+            $("#amount").val($("#slider-range-min").slider("value"));
+        });
+
+        function plot() {
+            // build layersArray
+            layerArray = []
+            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+                // if(isNaN(transparency[regionIndex])){
+                //     transparency[regionIndex] = 0
+                // }
+                console.log("Transparency region "+(regionIndex+1)+": "+transparency[regionIndex])
+                color = 'rgba(0,0,0,' + transparency[regionIndex] + ')'
+                layerObj = {
+                    sourcetype: "geojson",
+                    source: regions_geojson[regionIndex],
+                    type: 'fill',
+                    color: color
+                }
+                layerArray.push(layerObj)
+            }
+
+            //Build layout for plot
+            let layout = {
+                title: "Frequency of Earthquakes",
+                height: 1000,
+                width: 980,
+                mapbox: {
+                    center: {
+                        lat: 0,
+                        lon: 0
+                    },
+                    style: 'light',
+                    zoom: 0,
+                    layers: layerArray
+                }
+            };
+            Plotly.newPlot("mapDiv", data, layout, config)
+        }
+
+        // initialize default values for transparency
+        function initTransparency() {
+            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+                transparency[regionIndex] = 0
+            }
+        }
+
+        function buildCurrentYearDataArray(){
+            currentYearDataArray = []
+            for(let index = 0;index<earthquakesData.length;index++){
+                // console.log("year: "+new Date(earthquakesData[index].Timestamp).getFullYear())
+                // console.log("current year: "+currentYear)
+                if(new Date(earthquakesData[index].Timestamp).getFullYear() == currentYear){
+                    console.log("current year: "+currentYear)
+                    console.log(earthquakesData[index])
+                    currentYearDataArray.push(earthquakesData[index])
+                }
+            }
+        }
+
+        function updateTransparency() {
+            let annualFrequency = []
+            for(let index = 0;index<numberOfRegions;index++){
+                annualFrequency[index] = 0
+            }
+            for(let index = 0;index<currentYearDataArray.length;index++){
+                for(let regionIndex = 0;regionIndex<numberOfRegions;regionIndex++){
+                    if(currentYearDataArray[index].Region.localeCompare("region "+(regionIndex+1))==0){
+                        annualFrequency[regionIndex]=annualFrequency[regionIndex]+currentYearDataArray[index].Frequency
+                    }
+                }
+            }
+            let maxFrequency = 0
+            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+                console.log("Annual Freq region "+(regionIndex+1)+": "+annualFrequency[regionIndex])
+                if(annualFrequency[regionIndex]>maxFrequency){
+                    maxFrequency = annualFrequency[regionIndex]
+                }
+            }
+            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+                transparency[regionIndex] = annualFrequency[regionIndex] / maxFrequency
+            }
+        }
+
+    </script>
+</body>
+
+</html>

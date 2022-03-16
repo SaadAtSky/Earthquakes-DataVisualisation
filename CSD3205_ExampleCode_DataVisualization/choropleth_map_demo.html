@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Choropleth Map Demo</title>
+
+    <!-- Include Plotly JavaScript library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Include Axios - used by boundary_info.js  -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Include my JavaScript files -->
+    <script src="boundary_data.js"></script>
+    <script src="sentiment_data.js"></script>
+</head>
+<body>
+
+    <!-- Create DIV to hold the map -->
+    <div id="mapDiv" style="width:1000px;height:1000px;"></div>
+
+    <script>
+        //Key for Mapbox API
+        const MAPBOX_TOKEN='pk.eyJ1IjoiZGFvZ2FtZXoiLCJhIjoiY2pzdDZuazJ3MXVjbjQ5bzQ3YTFkbTg3OSJ9.l-KpHe-EPYvi3qfxQJSCUg';
+
+        //Store the geometry data from MapIt, so we only have to load it once
+        let londonGeom;
+
+        //Loads geometry data if it has not been loaded, then plots sentiment
+        function drawMap(){
+            //Only pull geometry data once to improve performance
+            if(londonGeom === undefined){
+                //Gets the geometry data about the London borough boundaries
+                getLondonBoroughs().then( (result, reject) => {
+
+                    /* Store boundary data to reduce API calls and
+                        speed up map drawing */
+                    londonGeom = result;
+
+                    //Plot sentiment data on map
+                    plotSentiment();
+                });
+            }
+            //We have already loaded the boundary data - just plot sentiment
+            else{
+                plotSentiment();
+            }
+        }
+
+        //Plots the sentiment of London boroughs
+        function plotSentiment() {
+            //Randomly generates a sentiment result for each borough
+            let demoSentimentData = getDemoSentimentData(londonGeom.length);
+
+            //Build layer array with geometry data and sentiment color coding
+            let layerArray = [];
+            for (let i = 0; i < londonGeom.length; ++i) {
+                //Set color depending on sentiment soore
+                let sentiment = demoSentimentData[i].SentimentScore.Positive;
+                let color = 0;
+                if (sentiment >= 0.5)//Red with varying transparency
+                    color = 'rgba(255,0, 0,' + sentiment + ')';
+                else//Black with varying transparency
+                    color = 'rgba(0,0, 0,' + (1 - sentiment) + ')';
+
+                //Create layer object for plot and add to array
+                let layerObj = {
+                    sourcetype: 'geojson',
+                    source: londonGeom[i],
+                    type: 'fill',
+                    color: color
+                };
+                layerArray.push(layerObj);
+            }
+
+            //Build layout for plot
+            let layout = {
+                title: "Sentiment in London Boroughs",
+                height: 1000,
+                width: 1000,
+                mapbox: {
+                    center: {
+                        lat: 51.515847,
+                        lon: -0.108752
+                    },
+                    style: 'light',
+                    zoom: 9,
+                    layers: layerArray
+                }
+            };
+
+            //Have to set data as scatter map box to get plot to work
+            let data = [{
+                type: 'scattermapbox',
+                lat: [51.515847],
+                lon: [-0.108752]
+            }];
+
+            //Need mapbox token to use Mapbox maps.
+            let config = {
+                mapboxAccessToken: MAPBOX_TOKEN
+            };
+
+            //Plot data on map
+            Plotly.newPlot("mapDiv", data, layout, config);
+        }
+
+        //Plot data on map
+        window.onload = drawMap;
+
+        //Redraw sentiment every 5 seconds
+        //setInterval(drawMap, 5000);
+
+    </script>
+
+</body>
+</html>
