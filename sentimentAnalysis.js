@@ -8,6 +8,17 @@ function buildSentimentGraph() {
     //initialize
     initSentimentArrays()
 
+    // create layout
+    var layout = {
+        title: 'Sentiment Analysis regarding Earthquakes in Guardian Newspaper' ,
+        xaxis: {
+          title: 'Years',
+        },
+        yaxis: {
+          title: 'Sentiment (%)',
+        }
+      };
+
     // loop through 1999-2022
     for (let year = 1999; year < 2022; year++) {
         yearsArray.push(year)
@@ -34,7 +45,7 @@ function buildSentimentGraph() {
         { x: yearsArray, y: positive, stackgroup: 'one', name: "Positive" },//positive
         { x: yearsArray, y: negative, stackgroup: 'one', name: "Negative" }//neg
     ];
-    Plotly.newPlot('sentimentDiv', traces, { title: 'Sentiment Analysis regarding Earthquakes in Guardian Newspaper' });
+    Plotly.newPlot('sentimentDiv', traces, layout);
 }
 
 function initSentimentArrays(){
