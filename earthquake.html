@@ -10,6 +10,10 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <!--websockets-->
     <script src="websocket.js"></script>
+    <!--text sentiment Analysis-->
+    <script src="sentimentAnalysis.js"></script>
+    <!--Earthquakes Data Chloropleth-->
+    <script src="earthquakesDataChloropleth.js"></script>
     <!--slider-->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
@@ -18,7 +22,9 @@
 </head>
 
 <body>
-    <!--Div that displays the data-->
+    <!--Div that displays the textual data-->
+    <div id="sentimentDiv"></div>
+    <!--Div that displays the numeric data-->
     <div id="mapDiv" style="width: 1000px;height: 1000px;"></div>
     <p>
         <label for="amount">Year:</label>
@@ -27,16 +33,21 @@
 
     <div id="slider-range-min"></div>
     <script>
+        // plot text sentiment analysis graph
+        // Plotly.newPlot('sentimentDiv', traces, { title: 'Sentiment Analysis regarding Earthquakes in Guardian Newspaper' });
+
         // variables declaration
         const MAPBOX_TOKEN = 'pk.eyJ1IjoiYmVsaWV2ZXI0dS0iLCJhIjoiY2wwanIyNXF4MDNqYTNjczhxbWJ6YXdvNCJ9.M-bbZyHNHfpxiAtw5fL_eQ'
         let layerObj = {}
-        let layerArray = [],currentYearDataArray = []
+        let layerArray = [], currentYearDataArray = []
         let regions_geojson = []
         let color;
         let numberOfRegions = 5
         let transparency = []
-        let earthquakesData
+        let traces = []
+        let earthquakesData,sentimentData
         let currentYear = 1960
+        let maxFrequency = 0
 
         // get boundaries geoJSON
         let regionCoordinates = []
@@ -85,86 +96,6 @@
             });
             $("#amount").val($("#slider-range-min").slider("value"));
         });
-
-        function plot() {
-            // build layersArray
-            layerArray = []
-            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
-                // if(isNaN(transparency[regionIndex])){
-                //     transparency[regionIndex] = 0
-                // }
-                console.log("Transparency region "+(regionIndex+1)+": "+transparency[regionIndex])
-                color = 'rgba(0,0,0,' + transparency[regionIndex] + ')'
-                layerObj = {
-                    sourcetype: "geojson",
-                    source: regions_geojson[regionIndex],
-                    type: 'fill',
-                    color: color
-                }
-                layerArray.push(layerObj)
-            }
-
-            //Build layout for plot
-            let layout = {
-                title: "Frequency of Earthquakes",
-                height: 1000,
-                width: 980,
-                mapbox: {
-                    center: {
-                        lat: 0,
-                        lon: 0
-                    },
-                    style: 'light',
-                    zoom: 0,
-                    layers: layerArray
-                }
-            };
-            Plotly.newPlot("mapDiv", data, layout, config)
-        }
-
-        // initialize default values for transparency
-        function initTransparency() {
-            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
-                transparency[regionIndex] = 0
-            }
-        }
-
-        function buildCurrentYearDataArray(){
-            currentYearDataArray = []
-            for(let index = 0;index<earthquakesData.length;index++){
-                // console.log("year: "+new Date(earthquakesData[index].Timestamp).getFullYear())
-                // console.log("current year: "+currentYear)
-                if(new Date(earthquakesData[index].Timestamp).getFullYear() == currentYear){
-                    console.log("current year: "+currentYear)
-                    console.log(earthquakesData[index])
-                    currentYearDataArray.push(earthquakesData[index])
-                }
-            }
-        }
-
-        function updateTransparency() {
-            let annualFrequency = []
-            for(let index = 0;index<numberOfRegions;index++){
-                annualFrequency[index] = 0
-            }
-            for(let index = 0;index<currentYearDataArray.length;index++){
-                for(let regionIndex = 0;regionIndex<numberOfRegions;regionIndex++){
-                    if(currentYearDataArray[index].Region.localeCompare("region "+(regionIndex+1))==0){
-                        annualFrequency[regionIndex]=annualFrequency[regionIndex]+currentYearDataArray[index].Frequency
-                    }
-                }
-            }
-            let maxFrequency = 0
-            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
-                console.log("Annual Freq region "+(regionIndex+1)+": "+annualFrequency[regionIndex])
-                if(annualFrequency[regionIndex]>maxFrequency){
-                    maxFrequency = annualFrequency[regionIndex]
-                }
-            }
-            for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
-                transparency[regionIndex] = annualFrequency[regionIndex] / maxFrequency
-            }
-        }
 
     </script>
 </body>
