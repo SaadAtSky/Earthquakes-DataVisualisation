@@ -13,7 +13,7 @@ connection.onmessage = function (msg) {
     // build frequency array based on returned frequencies
     // either build the whole array from 1960-2022 or ....
     console.log(msg)
-    let numberOfRowsOfEarthquakeData = 521
+    let numberOfRowsOfEarthquakeData = 520
     let numberOfRowsOfTextualData = 600 //or 874
     if(JSON.parse(msg.data).Count==numberOfRowsOfEarthquakeData){
         console.log("Earthquake Data recieved.");

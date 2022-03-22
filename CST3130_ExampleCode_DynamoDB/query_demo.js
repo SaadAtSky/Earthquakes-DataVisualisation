@@ -88,13 +88,22 @@ var QueryDemo;
     //     }
     // };
     // /* Retrieve the most recent five bitcoin prices*/
-    let params = {
-        TableName: "Crypto",
-        Limit: 5,
+    // let params = {
+    //     TableName: "Crypto",
+    //     Limit: 5,
+    //     ScanIndexForward: true,
+    //     KeyConditionExpression: "Currency = :curr",
+    //     ExpressionAttributeValues: {
+    //         ":curr" : "tron"
+    //     }
+    // };
+    var params = {
+        TableName: 'Earthquakes',
+        KeyConditionExpression: 'Region = :reg',
+        Limit: 100,
         ScanIndexForward: true,
-        KeyConditionExpression: "Currency = :curr",
         ExpressionAttributeValues: {
-            ":curr": "tron"
+            ':reg': "region 1"
         }
     };
     //Runs the query with the parameters

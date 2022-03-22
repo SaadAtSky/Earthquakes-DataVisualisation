@@ -20,7 +20,8 @@ var ScanDemo;
     /* A simple scan only requires the table name */
     let params = {
         TableName: "Earthquakes",
-        Limit: 2
+        ScanIndexForward: true
+        // Limit : 10
     };
     // /* Filters out items whose price is less than 1 */
     // let params = {
@@ -35,9 +36,8 @@ var ScanDemo;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let result = yield documentClient.scan(params).promise();
-                console.log("Scan results: ");
-                let itemsArray = result.Items;
-                console.log(itemsArray[0].Region);
+                console.log("results: ");
+                console.log(result);
             }
             catch (err) {
                 console.error("Scan Error:", JSON.stringify(err));
