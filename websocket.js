@@ -4,8 +4,9 @@ let connection = new WebSocket("wss://etjk1s1k10.execute-api.us-east-1.amazonaws
 //Log connected response
 connection.onopen = function (event) {
     console.log("Connected: " + JSON.stringify(event));
-    // getFrequencies()
+    getFrequencies()
     getSentiment()
+    getPredictions()
 };
 
 //Output messages from the server
@@ -26,14 +27,16 @@ connection.onmessage = function (msg) {
     else if(JSON.parse(msg.data).Count==numberOfRowsOfTextualData){
         console.log("Textual Data recieved.");
         sentimentData = JSON.parse(msg.data).Items
-        // console.log(sentimentData[0].Timestamp)
-        // console.log(sentimentData[0].Sentiment.Sentiment)
-        // console.log(sentimentData[0].Sentiment.SentimentScore.Positive)
-        // console.log(sentimentData[0].Sentiment.SentimentScore.Negative)
-        // console.log(sentimentData[0].Sentiment.SentimentScore.Mixed)
-        // console.log(sentimentData[0].Sentiment.SentimentScore.Neutral)
         buildSentimentGraph()
     }
+    else if(JSON.parse(msg.data).Count==5){
+        console.log("Predictions Data recieved.");
+        predictionsData = JSON.parse(msg.data).Items
+        // console.log(predictionsData[0].Region)
+        // console.log(predictionsData[0].Mean[0])
+        // console.log(predictionsData[0].Mean[1])
+    }
+    // else if we get predictions data back, we build predictions array
 
 }
 
@@ -65,6 +68,22 @@ function getSentiment() {
     //Create message to be sent to server
     let msgObject = {
         action: "getSentiment",//Used for routing in API Gateway
+        data: msgText
+    };
+
+    //Send message
+    connection.send(JSON.stringify(msgObject));
+
+    //Log result
+    console.log("Message sent: " + JSON.stringify(msgObject));
+}
+//Send message to server
+function getPredictions() {
+    let msgText = "date"
+
+    //Create message to be sent to server
+    let msgObject = {
+        action: "getPredictions",//Used for routing in API Gateway
         data: msgText
     };
 

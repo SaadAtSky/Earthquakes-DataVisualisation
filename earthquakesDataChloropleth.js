@@ -95,3 +95,16 @@ for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
 }
 console.log("MAX FREQ: " + maxFrequency)
 }
+
+function updateTransparencyPredictionsData(){
+    let startingYear = 2017
+    for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
+        let meanIndex = ((currentYear-startingYear)*2)
+        // find the correct region
+        predictionsData.forEach(function(data){
+            if(data.Region == (regionIndex+1)){
+                transparency[regionIndex] = (data.Mean[meanIndex]+data.Mean[meanIndex+1])/maxFrequency
+            }
+        })
+    }
+}

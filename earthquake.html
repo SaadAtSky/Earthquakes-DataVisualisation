@@ -42,7 +42,7 @@
         let numberOfRegions = 5
         let transparency = []
         let traces = []
-        let earthquakesData,sentimentData
+        let earthquakesData, sentimentData, predictionsData
         let currentYear = 1960
         let maxFrequency = 0
 
@@ -85,10 +85,18 @@
                 slide: function (event, ui) {
                     $("#amount").val(ui.value);
                     currentYear = ui.value
+                    // if currentYear < 2017 then build data using earthquakes data
+                    // if not then using predictions data
                     initTransparency()
-                    buildCurrentYearDataArray()
-                    updateTransparency()
-                    plot()
+                    if (currentYear < 2017) {
+                        buildCurrentYearDataArray()
+                        updateTransparency()
+                        plot()
+                    }
+                    else {
+                        updateTransparencyPredictionsData()
+                        plot()
+                    }
                 }
             });
             $("#amount").val($("#slider-range-min").slider("value"));

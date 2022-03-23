@@ -135,6 +135,6 @@ function init() {
     for (let region = 0; region < numberOfRegions; region++) {
         testData.push({ start: startDate.format("YYYY-MM-DD") , region: region, target: [] })
         trainData.push({ start: startDate.format("YYYY-MM-DD") , region: region, target: [] })
-        validationData.push({ start: "", region: region, target: [] })
+        validationData.push({ start: "", target: [] })
     }
 }
