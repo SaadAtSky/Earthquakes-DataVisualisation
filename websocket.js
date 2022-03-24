@@ -32,9 +32,6 @@ connection.onmessage = function (msg) {
     else if(JSON.parse(msg.data).Count==5){
         console.log("Predictions Data recieved.");
         predictionsData = JSON.parse(msg.data).Items
-        // console.log(predictionsData[0].Region)
-        // console.log(predictionsData[0].Mean[0])
-        // console.log(predictionsData[0].Mean[1])
     }
     // else if we get predictions data back, we build predictions array
 
@@ -47,12 +44,10 @@ connection.onerror = function (error) {
 
 //Send message to server
 function getFrequencies() {
-    let msgText = "date"
 
     //Create message to be sent to server
     let msgObject = {
         action: "getEarthquakesData",//Used for routing in API Gateway
-        data: msgText
     };
 
     //Send message
@@ -63,12 +58,10 @@ function getFrequencies() {
 }
 //Send message to server
 function getSentiment() {
-    let msgText = "date"
 
     //Create message to be sent to server
     let msgObject = {
         action: "getSentiment",//Used for routing in API Gateway
-        data: msgText
     };
 
     //Send message
@@ -79,12 +72,10 @@ function getSentiment() {
 }
 //Send message to server
 function getPredictions() {
-    let msgText = "date"
 
     //Create message to be sent to server
     let msgObject = {
         action: "getPredictions",//Used for routing in API Gateway
-        data: msgText
     };
 
     //Send message

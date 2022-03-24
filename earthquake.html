@@ -25,7 +25,7 @@
     <!--Div that displays the textual data-->
     <div id="sentimentDiv"></div>
     <!--Div that displays the numeric data-->
-    <div id="mapDiv" style="width: 1000px;height: 1000px;"></div>
+    <div id="mapDiv" style="width: 500px;height: 680px;"></div>
     <p>
         <label for="amount">Year:</label>
         <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
@@ -81,7 +81,7 @@
                 range: "min",
                 value: 1965,
                 min: 1965,
-                max: 2022,
+                max: 2026,
                 slide: function (event, ui) {
                     $("#amount").val(ui.value);
                     currentYear = ui.value

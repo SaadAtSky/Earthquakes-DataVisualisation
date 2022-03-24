@@ -19,8 +19,8 @@ function plot() {
     //Build layout for plot
     let layout = {
         title: "Frequency of Earthquakes",
-        height: 1000,
-        width: 980,
+        height: 700,
+        width: 680,
         mapbox: {
             center: {
                 lat: 0,
