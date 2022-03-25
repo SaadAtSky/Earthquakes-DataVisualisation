@@ -20,12 +20,47 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
 </head>
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+    .grid-item{
+        width: 500px;
+        height: 680px;
+    }
+    .heading{
+        font-size: 25px;
+        text-align: center;
+        font-family:papyrus;
+    }
+    .plot-container{
+        width: 900px;
+    }
+    h2{
+        text-align: center;
+    }
+</style>
 
 <body>
+    <div class = "heading">
+        <h1>EARTHQUAKES</h1>
+    </div>
     <!--Div that displays the textual data-->
-    <div id="sentimentDiv"></div>
-    <!--Div that displays the numeric data-->
-    <div id="mapDiv" style="width: 500px;height: 680px;"></div>
+    <div class="grid-container">
+        <div id="sentimentDiv"></div>
+        <div>
+            <h2>A summary of data presented</h2>
+            <p>This website is very very good</p>
+        </div>
+    </div>
+    <div class="grid-container">
+        <!--Div that displays the frequency data-->
+        <div id="mapDivFreq" class="grid-item" ></div>
+        <!--Div that displays the magnitude data-->
+        <div id="mapDivMag" class="grid-item" ></div>
+    </div>
+
     <p>
         <label for="amount">Year:</label>
         <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
@@ -35,16 +70,16 @@
     <script>
         // variables declaration
         const MAPBOX_TOKEN = 'pk.eyJ1IjoiYmVsaWV2ZXI0dS0iLCJhIjoiY2wwanIyNXF4MDNqYTNjczhxbWJ6YXdvNCJ9.M-bbZyHNHfpxiAtw5fL_eQ'
-        let layerObj = {}
-        let layerArray = [], currentYearDataArray = []
+        let currentYearDataArray = []
         let regions_geojson = []
         let color;
         let numberOfRegions = 5
-        let transparency = []
+        let transparencyFreq = []
+        let transparencyMag = []
         let traces = []
         let earthquakesData, sentimentData, predictionsData
         let currentYear = 1960
-        let maxFrequency = 0
+        let maxFrequency = 0,maxMagnitude = 0,minMagnitude = 100
 
         // get boundaries geoJSON
         let regionCoordinates = []

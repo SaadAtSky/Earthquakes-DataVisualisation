@@ -17,7 +17,7 @@ function buildSentimentGraph() {
         yaxis: {
           title: 'Sentiment (%)',
         },
-        width: 1100,
+        width: 1000,
         height: 500,
       };
 
