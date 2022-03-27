@@ -138,9 +138,14 @@ function updateTransparencyPredictionsData(){
     for (let regionIndex = 0; regionIndex < numberOfRegions; regionIndex++) {
         let meanIndex = ((currentYear-startingYear)*2)
         // find the correct region
-        predictionsData.forEach(function(data){
+        predictionsDataFreq.forEach(function(data){
             if(data.Region == (regionIndex+1)){
                 transparencyFreq[regionIndex] = (data.Mean[meanIndex]+data.Mean[meanIndex+1])/maxFrequency
+            }
+        })
+        predictionsDataMag.forEach(function(data){
+            if(data.Region == (regionIndex+1)){
+                transparencyMag[regionIndex] = (data.Mean[meanIndex]+data.Mean[meanIndex+1] - minMagnitude) / (maxMagnitude - minMagnitude)
             }
         })
     }

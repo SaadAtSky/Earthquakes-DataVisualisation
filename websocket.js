@@ -6,7 +6,7 @@ connection.onopen = function (event) {
     console.log("Connected: " + JSON.stringify(event));
     getFrequencies()
     getSentiment()
-    getPredictions()
+    getFrequencyPredictions()
 };
 
 //Output messages from the server
@@ -16,7 +16,7 @@ connection.onmessage = function (msg) {
     console.log(msg)
     let numberOfRowsOfEarthquakeData = 520
     let numberOfRowsOfTextualData = 600 //or 874
-    if(JSON.parse(msg.data).Count==numberOfRowsOfEarthquakeData){
+    if (JSON.parse(msg.data).Count == numberOfRowsOfEarthquakeData) {
         console.log("Earthquake Data recieved.");
         earthquakesData = JSON.parse(msg.data).Items
         getMaximumFrequency()
@@ -24,17 +24,22 @@ connection.onmessage = function (msg) {
         // updateTransparency()
         // plot()
     }
-    else if(JSON.parse(msg.data).Count==numberOfRowsOfTextualData){
+    else if (JSON.parse(msg.data).Count == numberOfRowsOfTextualData) {
         console.log("Textual Data recieved.");
         sentimentData = JSON.parse(msg.data).Items
         buildSentimentGraph()
     }
-    else if(JSON.parse(msg.data).Count==5){
-        console.log("Predictions Data recieved.");
-        predictionsData = JSON.parse(msg.data).Items
+    else if (JSON.parse(msg.data).Count == 5) {
+        if(predictionsDataFreq.length==0){
+            console.log("Frequency Predictions Data recieved.");
+            predictionsDataFreq = JSON.parse(msg.data).Items
+            getMagnitudePredictions()
+        }
+        else{
+            console.log("Magnitude Predictions Data recieved.");
+            predictionsDataMag = JSON.parse(msg.data).Items
+        }
     }
-    // else if we get predictions data back, we build predictions array
-
 }
 
 //Log errors
@@ -71,11 +76,25 @@ function getSentiment() {
     console.log("Message sent: " + JSON.stringify(msgObject));
 }
 //Send message to server
-function getPredictions() {
+function getFrequencyPredictions() {
 
     //Create message to be sent to server
     let msgObject = {
         action: "getPredictions",//Used for routing in API Gateway
+    };
+
+    //Send message
+    connection.send(JSON.stringify(msgObject));
+
+    //Log result
+    console.log("Message sent: " + JSON.stringify(msgObject));
+}
+//Send message to server
+function getMagnitudePredictions() {
+
+    //Create message to be sent to server
+    let msgObject = {
+        action: "getMagnitudePredictions",//Used for routing in API Gateway
     };
 
     //Send message

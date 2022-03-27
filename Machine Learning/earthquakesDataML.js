@@ -87,7 +87,7 @@ function buildCompleteData() {
                 }
             })
             array.forEach(function (data) {
-                testData[region].target.push(data.Frequency) // set target
+                testData[region].target.push(data.Frequency) // data could be Frequency or Magnitude
             })
         }
     }
@@ -116,7 +116,7 @@ function splitData() {
     }
 }
 
-// save files
+// save files for Magnitude or Frequency
 function saveFiles() {
     fs.writeFile("Datasets for ML/earthquakes/train.json", JSON.stringify(trainData), function (err, result) {
         if (err) console.log('error', err);
