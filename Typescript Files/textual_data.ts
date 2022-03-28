@@ -44,16 +44,3 @@ async function putData(data){
         console.log("Error sending data to DynamoDB "+JSON.stringify(err))
     }
 }
-
-// async function getTotalPageCount() {
-//     let pages
-//     pages = await guardian.content.search("earthquake%20AND%20magnitude", {section: "world", orderBy: "oldest" }).then(
-//         async function (response) {
-//             // console.log(response.body)
-//             let response_json = await JSON.parse(response.body)
-//             pages = response_json.response.pages
-//             // console.log(pages)
-//             return pages
-//         }
-//     )
-// }
