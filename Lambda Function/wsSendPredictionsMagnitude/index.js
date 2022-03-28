@@ -15,18 +15,17 @@ exports.handler = async (event) => {
     try {
         //Get Message from event
         const params = {
-            TableName: 'Earthquakes',
+            TableName: 'Predictions_EarthquakesMagnitude',
         };
         let result
         result = await documentClient.scan(params).promise();
-        console.log(event)
         
         const msg = JSON.stringify(result);
         console.log("Message: " + msg);
 
         //Respond to change in DB by sending data in DB to all connected clients
         try {
-            if(event.Records[0].eventName==="MODIFY" || event.Records[0].eventName==="INSERT"){
+            if(event.Records[0].eventName==="MODIFY" || event.Records[0].eventName==="INS"){
             let sendMsgPromises = await ws.getSendMessagePromises(msg, domainName, stage);
 
             //Execute promises
@@ -51,4 +50,7 @@ exports.handler = async (event) => {
     catch(err){
         return { statusCode: 500, body: "Error: " + JSON.stringify(err) };
     }
+
+    //Success
+    // return { statusCode: 200, body: "Earthquakes Data sent successfully." };
 };

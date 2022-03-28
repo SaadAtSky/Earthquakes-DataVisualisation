@@ -15,11 +15,10 @@ exports.handler = async (event) => {
     try {
         //Get Message from event
         const params = {
-            TableName: 'Earthquakes',
+            TableName: 'Predictions_Earthquakes',
         };
         let result
         result = await documentClient.scan(params).promise();
-        console.log(event)
         
         const msg = JSON.stringify(result);
         console.log("Message: " + msg);

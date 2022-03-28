@@ -15,11 +15,11 @@ exports.handler = async (event) => {
     try {
         //Get Message from event
         const params = {
-            TableName: 'Earthquakes',
+            TableName: 'SentimentData',
+            Limit:600
         };
         let result
         result = await documentClient.scan(params).promise();
-        console.log(event)
         
         const msg = JSON.stringify(result);
         console.log("Message: " + msg);
@@ -51,4 +51,7 @@ exports.handler = async (event) => {
     catch(err){
         return { statusCode: 500, body: "Error: " + JSON.stringify(err) };
     }
+
+    //Success
+    return { statusCode: 200, body: "Sentiment Data sent successfully." };
 };
