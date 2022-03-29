@@ -20,21 +20,21 @@ exports.handler = async (event) => {
         let result
         result = await documentClient.scan(params).promise();
         console.log(event)
-        
+
         const msg = JSON.stringify(result);
         console.log("Message: " + msg);
 
         //Respond to change in DB by sending data in DB to all connected clients
         try {
-            if(event.Records[0].eventName==="MODIFY" || event.Records[0].eventName==="INSERT"){
-            let sendMsgPromises = await ws.getSendMessagePromises(msg, domainName, stage);
+            if (event.Records[0].eventName === "MODIFY" || event.Records[0].eventName === "INSERT") {
+                let sendMsgPromises = await ws.getSendMessagePromises(msg, domainName, stage);
 
-            //Execute promises
-            await Promise.all(sendMsgPromises);
+                //Execute promises
+                await Promise.all(sendMsgPromises);
             }
         }
         //Get promises to send message to only the connected client
-        catch(err){
+        catch (err) {
             //Create parameters for API Gateway
             let apiMsg = {
                 ConnectionId: event.requestContext.connectionId,
@@ -42,13 +42,16 @@ exports.handler = async (event) => {
             };
             //Create API Gateway management class.
             const apigwManagementApi = new AWS.ApiGatewayManagementApi({
-            endpoint: domainName + '/' + stage});
+                endpoint: domainName + '/' + stage
+            });
             //Wait for API Gateway to execute and log result
             await apigwManagementApi.postToConnection(apiMsg).promise();
             console.log("Message '" + msg + "' sent to: " + event.requestContext.connectionId);
         }
     }
-    catch(err){
+    catch (err) {
         return { statusCode: 500, body: "Error: " + JSON.stringify(err) };
     }
+    //Success
+    return { statusCode: 200, body: "Data sent successfully." };
 };

@@ -1,0 +1,22 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+.grid-item{
+    width: 500px;
+    height: 680px;
+}
+.heading{
+    font-size: 25px;
+    text-align: center;
+    font-family:papyrus;
+}
+.plot-container{
+    width: 900px;
+}
+h2{
+    text-align: center;
+}
+#slider-range-min{
+    margin-top: 10px;
+}

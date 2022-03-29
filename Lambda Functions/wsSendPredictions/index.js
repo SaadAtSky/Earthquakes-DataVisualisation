@@ -50,4 +50,6 @@ exports.handler = async (event) => {
     catch(err){
         return { statusCode: 500, body: "Error: " + JSON.stringify(err) };
     }
+    //Success
+    return { statusCode: 200, body: "Data sent successfully." };
 };

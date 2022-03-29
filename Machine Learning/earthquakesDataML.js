@@ -21,10 +21,9 @@ connection.onopen = function (event) {
     getFrequencies()
 };
 
-//Output messages from the server
+// Upon connection to the WebSocket, build the earthquakes table, split data
+// into train/test/validation files and save these files in JSON format
 connection.onmessage = function (msg) {
-    // build frequency array based on returned frequencies
-    // either build the whole array from 1960-2022 or ....
     let numberOfRowsOfEarthquakeData = 520
     if (JSON.parse(msg.data).Count == numberOfRowsOfEarthquakeData) {
         console.log("Earthquake Data recieved.");
@@ -41,24 +40,21 @@ connection.onerror = function (error) {
     console.log("WebSocket Error: " + JSON.stringify(error));
 }
 
-//Send message to server
+//Send request to server
 function getFrequencies() {
-    let msgText = "date"
-
-    //Create message to be sent to server
-    let msgObject = {
+    //Create request to be sent to server
+    let requestObject = {
         action: "getEarthquakesData",//Used for routing in API Gateway
-        data: msgText
     };
 
     //Send message
-    connection.send(JSON.stringify(msgObject));
+    connection.send(JSON.stringify(requestObject));
 
     //Log result
-    console.log("Message sent: " + JSON.stringify(msgObject));
+    console.log("Message sent: " + JSON.stringify(requestObject));
 }
 
-// build complete data with updated start and target
+// build a sorted test data array containing all frequency/magnitude values from the returned data for each region
 function buildCompleteData() {
     for (let year = 1965; year <= 2022; year++) {
         let yearlyData = []
@@ -93,7 +89,7 @@ function buildCompleteData() {
     }
 }
 
-// split the file into train and test
+// split the data into train and validation data arrays with updated start time for valdiation data array
 function splitData() {
     for (let region = 0; region < numberOfRegions; region++) {
         let counter = 0
@@ -104,19 +100,19 @@ function splitData() {
             }
             if (counter < 43) { // build validationData
                 if (counter % 2 == 0) {
-                    validationStartingDate.add(12, "months")
+                    validationStartingDate.add(12, "months") // each 2 values for each region represents 12 months as values are separated by 6-month period
                 }
             }
-            else{
+            else {
                 validationData[region].target.push(data)
             }
             counter++
         })
-        validationData[region].start=validationStartingDate.format("YYYY-MM-DD") // set validationData start date
+        validationData[region].start = validationStartingDate.format("YYYY-MM-DD") // set validationData start date
     }
 }
 
-// save files for Magnitude or Frequency
+// save files using the train/test/validation data arrays for Magnitude or Frequency
 function saveFiles() {
     fs.writeFile("Datasets for ML/earthquakes/train.json", JSON.stringify(trainData), function (err, result) {
         if (err) console.log('error', err);
@@ -129,12 +125,13 @@ function saveFiles() {
     });
 }
 
+// initialize the data arrays with default values
 function init() {
-    let startDate = new Date(earthquakesData[0].Timestamp)
+    let startDate = new Date(earthquakesData[0].Timestamp) // the first date for the earthquakes data i.e 1965
     startDate = moment(startDate)
     for (let region = 0; region < numberOfRegions; region++) {
-        testData.push({ start: startDate.format("YYYY-MM-DD") , region: region, target: [] })
-        trainData.push({ start: startDate.format("YYYY-MM-DD") , region: region, target: [] })
+        testData.push({ start: startDate.format("YYYY-MM-DD"), region: region, target: [] })
+        trainData.push({ start: startDate.format("YYYY-MM-DD"), region: region, target: [] })
         validationData.push({ start: "", target: [] })
     }
 }

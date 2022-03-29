@@ -21,7 +21,6 @@ let endpointData = {
 };
 
 //Name of endpoint
-//REPLACE THIS WITH THE NAME OF YOUR ENDPOINT
 const endpointName = "endPointEarthquakes";
 
 //Parameters for calling endpoint
@@ -38,7 +37,7 @@ let awsRuntime = new AWS.SageMakerRuntime({});
 //Handler for Lambda function
 exports.handler = (event) => {
     //Call endpoint and handle response
-    awsRuntime.invokeEndpoint(params, (err, data)=>{
+    awsRuntime.invokeEndpoint(params, (err, data) => {
         if (err) {//An error occurred
             console.log(err, err.stack);
 
@@ -49,29 +48,29 @@ exports.handler = (event) => {
             };
             return response;
         }
-        else{//Successful response
+        else {//Successful response
             //Convert response data to JSON
             let responseData = JSON.parse(Buffer.from(data.Body).toString('utf8'));
             responseData = JSON.parse(JSON.stringify(responseData));
 
             //TODO: STORE DATA IN PREDICTION TABLE
             let numberOfRegions = 5;
-            for(let i = 0;i<numberOfRegions;i++){
-                let region = (i+1);
+            for (let index = 0; index < numberOfRegions; index++) {
+                let region = (index + 1);
                 let params2 = {
-                  TableName: "Predictions_Earthquakes",
-                  Item: {
-                    'Region': region,
-                    'Mean': responseData.predictions[i].mean,
-                    'Lower': responseData.predictions[i].quantiles["0.1"],
-                    'Upper': responseData.predictions[i].quantiles["0.9"] 
-                  }
+                    TableName: "Predictions_Earthquakes",
+                    Item: {
+                        'Region': region,
+                        'Mean': responseData.predictions[index].mean,
+                        'Lower': responseData.predictions[index].quantiles["0.1"],
+                        'Upper': responseData.predictions[index].quantiles["0.9"]
+                    }
                 };
                 try {
-                  let result = documentClient.put(params2).promise();
-                  console.log("Data uploaded successfully: " + JSON.stringify(result));
+                    let result = documentClient.put(params2).promise();
+                    console.log("Data uploaded successfully: " + JSON.stringify(result));
                 } catch (err) {
-                  console.error("ERROR uploading data: " + JSON.stringify(err));
+                    console.error("ERROR uploading data: " + JSON.stringify(err));
                 }
             }
 
