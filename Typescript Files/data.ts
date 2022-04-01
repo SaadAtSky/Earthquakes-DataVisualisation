@@ -1,8 +1,12 @@
 const csv = require('csv-parser')
 const fs = require('fs')
 const results = []
-let rawData = {}
-let timeSeries = []
+let rawData:{'region 1':{Date:string,Frequency:number,Magnitude:number},
+'region 2':{Date:string,Frequency:number,Magnitude:number}
+'region 3':{Date:string,Frequency:number,Magnitude:number}
+'region 4':{Date:string,Frequency:number,Magnitude:number}
+'region 5':{Date:string,Frequency:number,Magnitude:number}}={}
+let timeSeries:[] = []
 const moment = require('moment')
 let startDate = moment("01/01/1965")
 let endDate = moment("07/01/1965")
@@ -14,11 +18,12 @@ const AWS = require('aws-sdk')
     endpoint: "https://dynamodb.us-east-1.amazonaws.com"
 });
 
-initialize()
+initialize() // the array that stoes earthquakes data for each region
 
-fs.createReadStream('data/earthquake.csv')
+// read csv file and convert to JSON
+fs.createReadStream('./Typescript Files/data/earthquake.csv')
   .pipe(csv())
-  .on('data', (data) => {
+  .on('data', (data:object) => {
     //row by row
     generateTimeSeries(data)
   })
@@ -26,17 +31,16 @@ fs.createReadStream('data/earthquake.csv')
     // end of file reached
     averageMagnitude(rawData) //last iteration
     timeSeries.push(rawData)
-    console.log(counter)
-    for (let index = 0; index < timeSeries.length; index++) {
+    for (let index:number = 0; index < timeSeries.length; index++) {
       //store to dynamo DB
       putData(timeSeries[index])
     }
   });
 
-async function putData(data){
-  for(let i = 1;i<6;i++){
+async function putData(data: object[]){
+  for(let index:number = 1;index<6;index++){
     let documentClient = new AWS.DynamoDB.DocumentClient()
-    let region = 'region '+i
+    let region:string = 'region '+index
     let params = {
       TableName: "Earthquakes",
       Item: {
@@ -64,7 +68,7 @@ function initialize() {
   rawData['region 5'] = { 'Date': '', 'Frequency': 0, 'Magnitude': 0 }
 }
 
-function generateTimeSeries(data: string): void {
+function generateTimeSeries(data: { Date: string}): void {
   if (endDate.isAfter(data.Date)) {
     storeData(data)
   }
@@ -78,12 +82,12 @@ function generateTimeSeries(data: string): void {
   }
 }
 
-function storeData(data: object) {
-  let region = regionFinder(parseFloat(data.Longitude))
+function storeData(data: { Longitude: string; Magnitude: string }):void {
+  let region:string = regionFinder(parseFloat(data.Longitude))
   rawData[region] = { 'Date': new Date(startDate.format('MM-DD-YYYY')).getTime(), 'Frequency': parseInt(rawData[region].Frequency) + 1, 'Magnitude': parseFloat(rawData[region].Magnitude) + parseFloat(data.Magnitude) }
 }
 
-function averageMagnitude(rawData: string): void {
+function averageMagnitude(): void {
   rawData['region 1'].Magnitude = rawData['region 1'].Magnitude / rawData['region 1'].Frequency
   rawData['region 2'].Magnitude = rawData['region 2'].Magnitude / rawData['region 2'].Frequency
   rawData['region 3'].Magnitude = rawData['region 3'].Magnitude / rawData['region 3'].Frequency
@@ -91,7 +95,7 @@ function averageMagnitude(rawData: string): void {
   rawData['region 5'].Magnitude = rawData['region 5'].Magnitude / rawData['region 5'].Frequency
 }
 
-function regionFinder(longitude: float): string {
+function regionFinder(longitude: number): string {
   if (longitude > 108 && longitude <= 180) {
     return "region 1"
   }

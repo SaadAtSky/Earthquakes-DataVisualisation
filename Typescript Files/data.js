@@ -23,8 +23,9 @@ AWS.config.update({
     region: "us-east-1",
     endpoint: "https://dynamodb.us-east-1.amazonaws.com"
 });
-initialize();
-fs.createReadStream('data/earthquake.csv')
+initialize(); // the array that stoes earthquakes data for each region
+// read csv file and convert to JSON
+fs.createReadStream('./Typescript Files/data/earthquake.csv')
     .pipe(csv())
     .on('data', (data) => {
     //row by row
@@ -34,7 +35,6 @@ fs.createReadStream('data/earthquake.csv')
     // end of file reached
     averageMagnitude(rawData); //last iteration
     timeSeries.push(rawData);
-    console.log(counter);
     for (let index = 0; index < timeSeries.length; index++) {
         //store to dynamo DB
         putData(timeSeries[index]);
@@ -42,9 +42,9 @@ fs.createReadStream('data/earthquake.csv')
 });
 function putData(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        for (let i = 1; i < 6; i++) {
+        for (let index = 1; index < 6; index++) {
             let documentClient = new AWS.DynamoDB.DocumentClient();
-            let region = 'region ' + i;
+            let region = 'region ' + index;
             let params = {
                 TableName: "Earthquakes",
                 Item: {
@@ -88,7 +88,7 @@ function storeData(data) {
     let region = regionFinder(parseFloat(data.Longitude));
     rawData[region] = { 'Date': new Date(startDate.format('MM-DD-YYYY')).getTime(), 'Frequency': parseInt(rawData[region].Frequency) + 1, 'Magnitude': parseFloat(rawData[region].Magnitude) + parseFloat(data.Magnitude) };
 }
-function averageMagnitude(rawData) {
+function averageMagnitude() {
     rawData['region 1'].Magnitude = rawData['region 1'].Magnitude / rawData['region 1'].Frequency;
     rawData['region 2'].Magnitude = rawData['region 2'].Magnitude / rawData['region 2'].Frequency;
     rawData['region 3'].Magnitude = rawData['region 3'].Magnitude / rawData['region 3'].Frequency;

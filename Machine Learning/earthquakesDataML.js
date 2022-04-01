@@ -13,7 +13,7 @@ let numberOfRegions = 5
 
 // build earthquakesData using result form websockets
 //Open connection
-let connection = new WebSocket("wss://etjk1s1k10.execute-api.us-east-1.amazonaws.com/prod");
+let connection = new WebSocket("wss://bftt6ecxnk.execute-api.us-east-1.amazonaws.com/prod");
 
 //Log connected response
 connection.onopen = function (event) {

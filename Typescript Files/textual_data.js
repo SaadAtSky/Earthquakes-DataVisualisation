@@ -21,9 +21,11 @@ AWS.config.update({
     region: "us-east-1",
     endpoint: "https://dynamodb.us-east-1.amazonaws.com"
 });
+// loop through the results pages
 for (let index = 1; index <= totalPages; index++) {
     getData(index);
 }
+// for each page store data and send data to dynamoDB
 function getData(pageNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         guardian.content.search("earthquake%20AND%20magnitude", { page: pageNumber, section: "world", orderBy: "oldest" }).then(function (response) {
@@ -38,6 +40,7 @@ function getData(pageNumber) {
         });
     });
 }
+// sending data to dynamoDB
 function putData(data) {
     return __awaiter(this, void 0, void 0, function* () {
         let documentClient = new AWS.DynamoDB.DocumentClient();
@@ -57,15 +60,3 @@ function putData(data) {
         }
     });
 }
-// async function getTotalPageCount() {
-//     let pages
-//     pages = await guardian.content.search("earthquake%20AND%20magnitude", {section: "world", orderBy: "oldest" }).then(
-//         async function (response) {
-//             // console.log(response.body)
-//             let response_json = await JSON.parse(response.body)
-//             pages = response_json.response.pages
-//             // console.log(pages)
-//             return pages
-//         }
-//     )
-// }

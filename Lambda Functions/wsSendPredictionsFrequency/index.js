@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     try {
         //Get Message from event
         const params = {
-            TableName: 'Predictions_Earthquakes',
+            TableName: 'Predictions_EarthquakesFrequency',
         };
         let result
         result = await documentClient.scan(params).promise();

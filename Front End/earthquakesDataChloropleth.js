@@ -55,6 +55,10 @@ function plot() {
             layers: layerArrayMag
         }
     };
+    if(currentYear>2016){
+        layoutFreq.title = "Frequency PREDICTIONS"
+        layoutMag.title = "Average Magnitude PREDICTIONS"
+    }
     Plotly.newPlot("mapDivFreq", data, layoutFreq, config)
     Plotly.newPlot("mapDivMag", data, layoutMag, config)
 }

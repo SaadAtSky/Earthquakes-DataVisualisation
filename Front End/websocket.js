@@ -1,5 +1,5 @@
 //Open connection
-let connection = new WebSocket("wss://etjk1s1k10.execute-api.us-east-1.amazonaws.com/prod");
+let connection = new WebSocket("wss://bftt6ecxnk.execute-api.us-east-1.amazonaws.com/prod");
 
 //Log connected response
 connection.onopen = function (event) {
@@ -80,7 +80,7 @@ function getFrequencyPredictions() {
 
     //Create request to be sent to server
     let requestObject = {
-        action: "getPredictions",//Used for routing in API Gateway
+        action: "getFrequencyPredictions",//Used for routing in API Gateway
     };
 
     //Send message

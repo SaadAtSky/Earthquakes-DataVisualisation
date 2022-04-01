@@ -54,7 +54,7 @@ exports.handler = (event) => {
             let responseData = JSON.parse(Buffer.from(data.Body).toString('utf8'));
             responseData = JSON.parse(JSON.stringify(responseData));
 
-            //TODO: STORE DATA IN PREDICTION TABLE
+            //STORE DATA IN PREDICTION TABLE
             let numberOfRegions = 5;
             for(let i = 0;i<numberOfRegions;i++){
                 let region = (i+1);

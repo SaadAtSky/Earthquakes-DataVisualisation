@@ -1,5 +1,5 @@
 import Guardian from 'guardian-js'
-let apikey = '85e7fd2b-56f1-4deb-98c3-d622f9132eac'
+let apikey:string = '85e7fd2b-56f1-4deb-98c3-d622f9132eac'
 const guardian = new Guardian(apikey, false)
 let totalPages:number = 88
 const AWS = require('aws-sdk')
@@ -8,13 +8,15 @@ AWS.config.update({
     endpoint: "https://dynamodb.us-east-1.amazonaws.com"
 })
 
-for (let index = 1; index <= totalPages; index++) {
+// loop through the results pages
+for (let index:number = 1; index <= totalPages; index++) {
     getData(index)
 }
 
+// for each page store data and send data to dynamoDB
 async function getData(pageNumber: number) {
     guardian.content.search("earthquake%20AND%20magnitude", { page: pageNumber, section: "world", orderBy: "oldest" }).then(
-        function (response) {
+        function (response:{body:string}):void {
             console.log(response.body)
             let response_json = JSON.parse(response.body)
             for (let i = 0; i < response_json.response.results.length; i++) {
@@ -27,9 +29,10 @@ async function getData(pageNumber: number) {
     )
 }
 
-async function putData(data){
+// sending data to dynamoDB
+async function putData(data:{webPublicationDate:string,webTitle:string}){
     let documentClient = new AWS.DynamoDB.DocumentClient()
-    let params = {
+    let params:object = {
         TableName : 'Guardian_newspaper',
         Item : {
             'Timestamp' : Date.parse(data.webPublicationDate),
